@@ -25,7 +25,7 @@ A console-based Expense Tracker in C++ that lets you add, view, search, and dele
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/expense-tracker.git
+   git clone https://github.com/totallynotparag/expense-tracker.git
    cd expense-tracker
    ```
 2. Compile:
