@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Spendly: Expense Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eaf0f6;--ink:#14213d;--mute:#5d6b82;--line:#d3dce8;--panel:#14213d;--acc:#f2b134;--hover:#dfe8f2;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b101b;--ink:#e8edf5;--mute:#8d9ab2;--line:#222f47;--panel:#16254a;--hover:#141d30;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0b101b;--ink:#e8edf5;--mute:#8d9ab2;--line:#222f47;--panel:#16254a;--hover:#141d30;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Figtree,system-ui,-apple-system,"Segoe UI",sans-serif}
+h1,h2,.num{font-family:"Bricolage Grotesque",Figtree,system-ui,sans-serif;letter-spacing:-.02em}
+button,input,select{font:inherit;color:inherit}
+.wrap{max-width:1060px;margin:0 auto;padding:20px 18px 48px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.brand{font:800 22px "Bricolage Grotesque",Figtree,sans-serif;letter-spacing:-.03em}
+.ghost{background:none;border:1px solid var(--line);border-radius:99px;padding:6px 14px;cursor:pointer;color:var(--mute)}
+.ghost:hover{background:var(--hover)}
+.cols{display:grid;gap:28px}
+@media (min-width:880px){.cols{grid-template-columns:370px 1fr;align-items:start}}
+.panel{background:var(--panel);color:#f3f6fb;border-radius:28px;padding:26px 24px 24px}
+.panel small{color:#a9b6d0}
+.big{font-size:clamp(40px,9vw,52px);font-weight:800;line-height:1.05;margin:4px 0 2px}
+.fld{display:block;margin-top:18px}
+.fld>span{display:block;font-size:14px;color:#a9b6d0;margin-bottom:6px}
+.in{width:100%;background:rgba(255,255,255,.08);border:1.5px solid transparent;border-radius:14px;padding:12px 14px;color:#fff;color-scheme:dark}
+.in:focus{outline:none;border-color:var(--acc)}
+.in::placeholder{color:#7f8eac}
+.amt{font:700 28px "Bricolage Grotesque",sans-serif;padding:10px 14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:rgba(255,255,255,.08);border:1.5px solid transparent;border-radius:99px;padding:6px 12px;cursor:pointer;color:#e6ecf7;transition:background .15s}
+.chip:hover{background:rgba(255,255,255,.15)}
+.chip.on{background:var(--acc);color:#2a1d00;font-weight:700}
+.btn{width:100%;margin-top:22px;background:var(--acc);color:#2a1d00;font-weight:700;border:0;border-radius:14px;padding:14px;cursor:pointer}
+.btn:hover{filter:brightness(1.07)}
+.cancel{display:none;width:100%;margin-top:8px;background:none;border:0;color:#a9b6d0;cursor:pointer;padding:8px}
+.err{min-height:20px;margin:10px 0 0;color:var(--acc);font-size:14px}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+h2{font-size:22px;margin:0 0 12px}
+.stack{display:flex;height:16px;border-radius:99px;overflow:hidden;background:var(--line)}
+.stack i{display:block;height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;margin:12px 0 0;padding:0;list-style:none;color:var(--mute);font-size:14px}
+.legend b{color:var(--ink);font-weight:700}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}
+.tools{display:flex;gap:10px;margin:30px 0 6px}
+.tools .in{background:transparent;border:1.5px solid var(--line);color:var(--ink);color-scheme:inherit}
+.tools .in:focus{border-color:var(--ink)}
+.tools select{width:auto}
+.tools .in::placeholder{color:var(--mute)}
+#list{list-style:none;margin:0;padding:0}
+.row{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:14px;align-items:center;padding:14px 4px;border-bottom:1px solid var(--line)}
+.badge{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-size:20px;background:color-mix(in srgb,var(--c) 22%,transparent)}
+.mid b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:700}
+.mid small{color:var(--mute)}
+.price{font:700 18px "Bricolage Grotesque",sans-serif}
+.acts button{background:none;border:0;color:var(--mute);cursor:pointer;font-size:16px;padding:6px;border-radius:8px}
+.acts button:hover{background:var(--hover);color:var(--ink)}
+.empty{padding:34px 4px;color:var(--mute)}
+.empty button{background:none;border:0;padding:0;color:var(--ink);text-decoration:underline;cursor:pointer}
+.note{margin-top:28px;color:var(--mute);font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><div class="brand">Spendly</div><button class="ghost" id="theme" aria-label="Switch light or dark theme">Theme</button></div>
+  <div class="cols">
+    <section class="panel" aria-label="Add expense">
+      <small>Spent this month</small>
+      <div class="big num" id="month">₹0</div>
+      <small id="all">Nothing logged yet</small>
+      <label class="fld"><span>Amount in rupees</span><input class="in amt" id="amount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00"></label>
+      <div class="fld"><span>Category</span><div class="chips" id="chips"></div></div>
+      <label class="fld"><span>Date</span><input class="in" id="date" type="date"></label>
+      <label class="fld"><span>What was it for?</span><input class="in" id="desc" type="text" maxlength="60" placeholder="Lunch, bus pass, notebooks"></label>
+      <p class="err" id="err" role="alert"></p>
+      <button class="btn" id="go">Add expense</button>
+      <button class="cancel" id="cancel">Cancel editing</button>
+    </section>
+    <main>
+      <h2>Where it went</h2>
+      <div class="stack" id="stack"></div>
+      <ul class="legend" id="legend"></ul>
+      <div class="tools">
+        <input class="in" id="q" type="search" placeholder="Search expenses" aria-label="Search expenses">
+        <select class="in" id="f" aria-label="Filter by category"></select>
+      </div>
+      <ul id="list"></ul>
+      <p class="note">Your expenses are saved in this browser only. Clearing site data will remove them.</p>
+    </main>
+  </div>
+</div>
+<script>
+const CATS={Food:['🍜','#e8743b'],Travel:['🚌','#3b8fd9'],Bills:['💡','#e3b02e'],Shopping:['🛍️','#c2569b'],Health:['💊','#3fae7a'],Fun:['🎬','#8a63d2'],Other:['✨','#8b93a3']};
+const $=s=>document.querySelector(s);
+const money=n=>new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:2}).format(n);
+const ymd=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const today=()=>ymd(new Date());
+const pretty=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})};
+const esc=s=>s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const KEY='spendly.expenses.v1';
+let items=[],editId=null,cat='Food';
+try{items=JSON.parse(localStorage.getItem(KEY))||[]}catch(e){items=[]}
+if(!Array.isArray(items))items=[];
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(items))}catch(e){}};
+
+$('#chips').innerHTML=Object.entries(CATS).map(([k,v])=>`<button type="button" class="chip" data-cat="${k}">${v[0]} ${k}</button>`).join('');
+$('#f').innerHTML='<option value="All">All categories</option>'+Object.keys(CATS).map(k=>`<option>${k}</option>`).join('');
+function pick(k){cat=k;document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.dataset.cat===k))}
+$('#chips').onclick=e=>{const b=e.target.closest('.chip');if(b)pick(b.dataset.cat)};
+
+function resetForm(){editId=null;$('#amount').value='';$('#desc').value='';$('#date').value=today();$('#err').textContent='';$('#go').textContent='Add expense';$('#cancel').style.display='none';pick('Food')}
+function submit(){
+  const amount=parseFloat($('#amount').value);
+  if(!(amount>0)){$('#err').textContent='Enter an amount greater than 0.';$('#amount').focus();return}
+  const date=$('#date').value||today(),desc=$('#desc').value.trim();
+  if(editId){Object.assign(items.find(i=>i.id===editId),{amount,cat,date,desc})}
+  else items.push({id:Date.now(),amount,cat,date,desc});
+  save();resetForm();render();
+}
+$('#go').onclick=submit;
+$('#cancel').onclick=resetForm;
+['amount','date','desc'].forEach(id=>$('#'+id).addEventListener('keydown',e=>{if(e.key==='Enter')submit()}));
+$('#q').oninput=render;$('#f').onchange=render;
+
+$('#list').onclick=e=>{
+  const d=e.target.closest('[data-del]'),ed=e.target.closest('[data-edit]'),s=e.target.closest('[data-sample]');
+  if(s){sample();return}
+  if(d){items=items.filter(x=>x.id!==+d.dataset.del);if(editId===+d.dataset.del)resetForm();save();render()}
+  if(ed){const x=items.find(i=>i.id===+ed.dataset.edit);editId=x.id;$('#amount').value=x.amount;$('#date').value=x.date;$('#desc').value=x.desc;pick(x.cat);$('#go').textContent='Save changes';$('#cancel').style.display='block';$('#err').textContent='';$('#amount').focus();window.scrollTo({top:0,behavior:'smooth'})}
+};
+function sample(){
+  const S=[['Food',240,'Lunch at the canteen',0],['Travel',60,'Bus pass top-up',1],['Bills',899,'Mobile recharge',3],['Shopping',1499,'Headphones',5],['Food',180,'Coffee with friends',6],['Fun',350,'Movie night',8],['Health',420,'Pharmacy',10],['Other',150,'Printouts',12]];
+  const now=Date.now();
+  S.forEach(([c,a,d,o],i)=>{const t=new Date();t.setDate(t.getDate()-o);items.push({id:now+i,amount:a,cat:c,desc:d,date:ymd(t)})});
+  save();render();
+}
+
+function render(){
+  const total=items.reduce((a,x)=>a+x.amount,0),ym=today().slice(0,7);
+  const month=items.filter(x=>x.date.startsWith(ym)).reduce((a,x)=>a+x.amount,0);
+  $('#month').textContent=money(month);
+  $('#all').textContent=items.length?money(total)+' across '+items.length+(items.length===1?' expense':' expenses')+' in total':'Nothing logged yet';
+  const sums={};items.forEach(x=>sums[x.cat]=(sums[x.cat]||0)+x.amount);
+  const sorted=Object.entries(sums).sort((a,b)=>b[1]-a[1]);
+  $('#stack').innerHTML=sorted.map(([k,v])=>`<i title="${k}" style="width:${v/total*100}%;background:${CATS[k][1]}"></i>`).join('');
+  $('#legend').innerHTML=sorted.length?sorted.map(([k,v])=>`<li><span class="dot" style="background:${CATS[k][1]}"></span>${k} <b>${money(v)}</b></li>`).join(''):'<li>Add your first expense to see the split by category.</li>';
+  const q=$('#q').value.trim().toLowerCase(),f=$('#f').value;
+  const list=items.filter(x=>(f==='All'||x.cat===f)&&(!q||(x.desc+' '+x.cat).toLowerCase().includes(q))).sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
+  $('#list').innerHTML=list.length?list.map(x=>`<li class="row" style="--c:${CATS[x.cat][1]}"><div class="badge">${CATS[x.cat][0]}</div><div class="mid"><b>${esc(x.desc||x.cat)}</b><small>${x.cat}, ${pretty(x.date)}</small></div><div class="price">${money(x.amount)}</div><div class="acts"><button data-edit="${x.id}" aria-label="Edit expense" title="Edit">✎</button><button data-del="${x.id}" aria-label="Delete expense" title="Delete">✕</button></div></li>`).join(''):
+    `<li class="empty">${items.length?'No expenses match your search.':'No expenses yet. Add one on the left, or <button data-sample="1">fill in some sample data</button> to try it out.'}</li>`;
+}
+
+const root=document.documentElement;
+try{const t=localStorage.getItem('spendly.theme');if(t)root.dataset.theme=t}catch(e){}
+$('#theme').onclick=()=>{
+  const dark=root.dataset.theme?root.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
+  const n=dark?'light':'dark';root.dataset.theme=n;
+  try{localStorage.setItem('spendly.theme',n)}catch(e){}
+};
+resetForm();render();
+</script>
+</body>
+</html>
